@@ -1,0 +1,231 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meu Mural</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f3f5;
+            color: #222;
+        }
+
+        header {
+            background: white;
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 30px auto;
+        }
+
+        .post {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,.08);
+        }
+
+        .date {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .text {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 17px;
+        }
+
+        .post img {
+            width: 100%;
+            max-height: 600px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .post a {
+            display: block;
+            margin-top: 15px;
+            color: #1769aa;
+            word-break: break-all;
+        }
+
+        .loading {
+            text-align: center;
+            color: #777;
+        }
+
+        .empty {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            color: #777;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>📌 Meu Mural</h1>
+</header>
+
+<div class="container">
+
+    <div id="mural">
+        <div class="loading">
+            Carregando mural...
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+
+async function carregarMural() {
+
+    try {
+
+        const resposta = await fetch(
+            "api.php?action=list"
+        );
+
+        const posts = await resposta.json();
+
+        const mural =
+            document.getElementById("mural");
+
+        mural.innerHTML = "";
+
+
+        if (posts.length === 0) {
+
+            mural.innerHTML = `
+                <div class="empty">
+                    Nenhuma publicação ainda.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        posts.forEach(post => {
+
+            const elemento =
+                document.createElement("div");
+
+            elemento.className = "post";
+
+
+            if (post.data) {
+
+                const data =
+                    document.createElement("div");
+
+                data.className = "date";
+
+                data.textContent = post.data;
+
+                elemento.appendChild(data);
+            }
+
+
+            if (post.texto) {
+
+                const texto =
+                    document.createElement("div");
+
+                texto.className = "text";
+
+                texto.textContent = post.texto;
+
+                elemento.appendChild(texto);
+            }
+
+
+            if (post.imagem) {
+
+                const imagem =
+                    document.createElement("img");
+
+                imagem.src = post.imagem;
+
+                imagem.alt = "Imagem publicada";
+
+                elemento.appendChild(imagem);
+            }
+
+
+            if (post.link) {
+
+                const link =
+                    document.createElement("a");
+
+                link.href = post.link;
+
+                link.target = "_blank";
+
+                link.rel = "noopener noreferrer";
+
+                link.textContent =
+                    "🔗 " + post.link;
+
+                elemento.appendChild(link);
+            }
+
+
+            mural.appendChild(elemento);
+
+        });
+
+    }
+
+    catch (erro) {
+
+        document.getElementById("mural").innerHTML = `
+            <div class="empty">
+                Não foi possível carregar o mural.
+            </div>
+        `;
+
+        console.error(erro);
+    }
+
+}
+
+
+carregarMural();
+
+</script>
+
+</body>
+</html>
+```
